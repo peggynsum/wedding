@@ -821,60 +821,11 @@
             <h3 class="font-editorial text-lg text-[#6E434D]">新人後台：相片保存 &amp; 統計</h3>
             <p class="text-[11px] text-[#966872]">僅限新人查看，賓客完全無法看到此面板</p>
           </div>
-          <button type="button" onclick="closeStatsModal()" class="w-8 h-8 rounded-full bg-[#F8E5EA] text-[#6E434D] flex items-center justify-center text-sm">✕</button>
-        </div>
-
-        <!-- Permanent Photo Backup & Export Section -->
-        <div class="px-4 py-3 bg-[#FFFDFD] border-b border-[#6E434D]/12 flex items-center justify-between gap-2 text-xs">
-          <div class="text-[11px] text-[#6E434D]">
-            <span class="font-semibold">永久保存相片：</span>上載完所有相片後可匯出獨立網頁檔
-          </div>
-          <button type="button" onclick="exportSelfContainedHTML()" class="px-3 py-1.5 rounded-full bg-[#F8E5EA] border border-[#6E434D]/30 text-[#6E434D] text-[11px] font-semibold shrink-0 hover:bg-[#F3D7DF] transition">
-            ⬇️ 匯出含相片網頁
-          </button>
-        </div>
-
-        <!-- Google Sheet Direct Link & Apps Script Webhook Connector -->
-        <div class="p-4 bg-[#FAECF0] border-b border-[#6E434D]/12 space-y-2.5 text-xs">
-          <div class="flex items-center justify-between gap-2">
-            <a href="https://docs.google.com/spreadsheets/d/1iPenRlEW_nlAzsghGq6lA0E6hqy86gjkU_KOLYhMLoQ/edit?usp=sharing" target="_blank" rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6E434D] text-[#FFFDFD] text-[11px] font-medium hover:bg-[#59343D] transition">
-              <span>📗</span>
-              <span>開啟你的 Google Sheet ↗</span>
-            </a>
-            <button type="button" onclick="toggleAppsScriptGuide()" class="text-[11px] underline text-[#6E434D] font-medium">
-              設定自動寫入教學
-            </button>
-          </div>
-
           <div class="flex items-center gap-1.5">
-            <input
-              id="google-webhook-input"
-              type="url"
-              placeholder="貼上 Apps Script Web App URL (/exec)..."
-              class="brown-input flex-1 px-3 py-1.5 rounded-lg text-[11px]"
-            />
-            <button type="button" onclick="saveGoogleWebhookUrl()" class="px-3 py-1.5 rounded-lg bg-[#6E434D] text-[#FFFDFD] text-[11px] font-medium shrink-0">
-              儲存
+            <button type="button" onclick="exitAdminMode()" class="px-2.5 py-1.5 rounded-full bg-[#F8E5EA] border border-[#6E434D]/25 text-[#6E434D] text-[11px] font-medium hover:bg-[#F3D7DF] transition">
+              🔒 退出管理
             </button>
-            <button type="button" onclick="testGoogleWebhook()" class="px-2.5 py-1.5 rounded-lg bg-[#FFFDFD] border border-[#6E434D]/30 text-[#6E434D] text-[11px] font-medium shrink-0">
-              測試
-            </button>
-          </div>
-
-          <!-- Collapsible 1-Minute Apps Script Code Box -->
-          <div id="apps-script-guide" class="hidden p-3 rounded-xl bg-[#FFFDFD] border border-[#6E434D]/20 space-y-2 text-[11px] text-[#6E434D]">
-            <p class="font-semibold">步驟：在你的 Google Sheet 點選「擴充功能 &gt; Apps Script」，貼上以下程式碼並「部署為網頁應用程式（誰可以存取：所有人）」，再將產生的 /exec 網址貼在上方（儲存後請重新匯出網頁）：</p>
-            <pre id="apps-script-snippet" class="p-2 rounded-lg bg-[#FDF6F7] border border-[#6E434D]/15 text-[10px] overflow-x-auto select-all leading-relaxed">function doPost(e) {
-  var sheet = SpreadsheetApp.openById('1iPenRlEW_nlAzsghGq6lA0E6hqy86gjkU_KOLYhMLoQ').getSheets()[0];
-  var raw = (e &amp;&amp; e.postData &amp;&amp; e.postData.contents) ? e.postData.contents : '{}';
-  var d = JSON.parse(raw);
-  sheet.appendRow([d.timestamp || new Date().toLocaleString(), d.name || '', d.attending || '', d.companions || '', d.departure || '', d.words || '']);
-  return ContentService.createTextOutput(JSON.stringify({status:'ok'})).setMimeType(ContentService.MimeType.JSON);
-}</pre>
-            <button type="button" onclick="copyAppsScriptSnippet()" class="px-3 py-1 rounded-full bg-[#F8E5EA] border border-[#6E434D]/25 text-[10.5px] font-semibold">
-              📋 複製 Apps Script 程式碼
-            </button>
+            <button type="button" onclick="closeStatsModal()" class="w-8 h-8 rounded-full bg-[#F8E5EA] text-[#6E434D] flex items-center justify-center text-sm">✕</button>
           </div>
         </div>
 
@@ -1588,13 +1539,10 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    function saveGoogleWebhookUrl() {
-      const inp = document.getElementById('google-webhook-input');
-      googleWebhookUrl = inp ? inp.value.trim() : '';
-      try {
-        localStorage.setItem('ps_wedding_gsheet_webhook', googleWebhookUrl);
-      } catch (e) {}
-      showToast('已儲存 Google Sheet 自動寫入網址！');
+    function exitAdminMode() {
+      closeStatsModal();
+      setAdminMode(false, false);
+      showToast('已退出管理模式，目前為賓客瀏覽視角');
     }
 
     function toggleAppsScriptGuide() {
